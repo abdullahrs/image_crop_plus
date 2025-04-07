@@ -4,9 +4,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:insta_assets_crop/insta_assets_crop.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
-import 'package:video_player/video_player.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:mime/mime.dart';
+// import 'package:video_player/video_player.dart';
 
 enum PickedFileType { image, video }
 
@@ -17,30 +17,30 @@ class PickedFile {
     required this.type,
   });
 
-  static Future<PickedFile> create(XFile xfile) async {
-    final String? mimeType = lookupMimeType(xfile.path);
-    final bool isImage = mimeType?.startsWith('image/') ?? false;
-    final bool isVideo = mimeType?.startsWith('video/') ?? false;
+  // static Future<PickedFile> create(XFile xfile) async {
+  //   final String? mimeType = lookupMimeType(xfile.path);
+  //   final bool isImage = mimeType?.startsWith('image/') ?? false;
+  //   final bool isVideo = mimeType?.startsWith('video/') ?? false;
 
-    Size? size;
+  //   Size? size;
 
-    if (isImage) {
-      final decodedImage = await decodeImageFromList(await xfile.readAsBytes());
-      final height = decodedImage.height;
-      final width = decodedImage.width;
-      size = Size(width.toDouble(), height.toDouble());
-    }
+  //   if (isImage) {
+  //     final decodedImage = await decodeImageFromList(await xfile.readAsBytes());
+  //     final height = decodedImage.height;
+  //     final width = decodedImage.width;
+  //     size = Size(width.toDouble(), height.toDouble());
+  //   }
 
-    return PickedFile(
-      file: File(xfile.path),
-      size: size,
-      type: isImage
-          ? PickedFileType.image
-          : isVideo
-              ? PickedFileType.video
-              : null,
-    );
-  }
+  //   return PickedFile(
+  //     file: File(xfile.path),
+  //     size: size,
+  //     type: isImage
+  //         ? PickedFileType.image
+  //         : isVideo
+  //             ? PickedFileType.video
+  //             : null,
+  //   );
+  // }
 
   PickedFile copyWithSize(Size newSize) =>
       PickedFile(file: file, size: newSize, type: type);
@@ -73,16 +73,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final cropKey = GlobalKey<CropState>();
   PickedFile? _pickedFile;
-  VideoPlayerController? videoController;
+  // VideoPlayerController? videoController;
 
   bool get isVideo => _pickedFile?.isVideo ?? false;
-  bool get isPlaying => videoController?.value.isPlaying ?? false;
+  // bool get isPlaying => videoController?.value.isPlaying ?? false;
 
   @override
   void dispose() {
     super.dispose();
     _pickedFile?.delete();
-    videoController?.dispose();
+    // videoController?.dispose();
   }
 
   @override
@@ -110,19 +110,19 @@ class _MyAppState extends State<MyApp> {
               onTap: () {
                 if (!isVideo) return;
 
-                if (videoController == null) return;
-                if (isPlaying) {
-                  videoController?.pause();
-                  return;
-                }
-                if (videoController?.value.duration ==
-                    videoController?.value.position) {
-                  videoController
-                    ?..seekTo(Duration.zero)
-                    ..play();
-                  return;
-                }
-                videoController?.play();
+                // if (videoController == null) return;
+                // if (isPlaying) {
+                //   videoController?.pause();
+                //   return;
+                // }
+                // if (videoController?.value.duration ==
+                //     videoController?.value.position) {
+                //   videoController
+                //     ?..seekTo(Duration.zero)
+                //     ..play();
+                //   return;
+                // }
+                // videoController?.play();
               },
               child: Stack(
                 alignment: Alignment.center,
@@ -130,27 +130,27 @@ class _MyAppState extends State<MyApp> {
                   if (_pickedFile?.size != null)
                     Crop(
                       child: isVideo
-                          ? VideoPlayer(videoController!)
+                          ? SizedBox.shrink() //VideoPlayer(videoController!)
                           : Image.file(_pickedFile!.file),
                       size: _pickedFile!.size!,
                       key: cropKey,
                       disableResize: true,
                       aspectRatio: 1,
                     ),
-                  if (isVideo && videoController != null)
-                    AnimatedBuilder(
-                      animation: videoController!,
-                      builder: (_, __) => AnimatedOpacity(
-                        opacity: isPlaying ? 0 : 1,
-                        duration: kThemeAnimationDuration,
-                        child: CircleAvatar(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.black.withOpacity(0.7),
-                          radius: 24,
-                          child: const Icon(Icons.play_arrow_rounded, size: 40),
-                        ),
-                      ),
-                    ),
+                  // if (isVideo && videoController != null)
+                  //   AnimatedBuilder(
+                  //     animation: videoController!,
+                  //     builder: (_, __) => AnimatedOpacity(
+                  //       opacity: isPlaying ? 0 : 1,
+                  //       duration: kThemeAnimationDuration,
+                  //       child: CircleAvatar(
+                  //         foregroundColor: Colors.white,
+                  //         backgroundColor: Colors.black.withOpacity(0.7),
+                  //         radius: 24,
+                  //         child: const Icon(Icons.play_arrow_rounded, size: 40),
+                  //       ),
+                  //     ),
+                  //   ),
                 ],
               ),
             ),
@@ -187,46 +187,46 @@ class _MyAppState extends State<MyApp> {
             .labelLarge
             ?.copyWith(color: Colors.white),
       ),
-      onPressed: () => _openFile(),
+      onPressed: () => {},//_openFile(),
     );
   }
 
-  Future<void> _openFile() async {
-    final xfile = await ImagePicker().pickMedia();
+  // Future<void> _openFile() async {
+  //   // final xfile = await ImagePicker().pickMedia();
 
-    if (xfile == null) return;
+  //   if (xfile == null) return;
 
-    final file = await PickedFile.create(xfile);
+  //   final file = await PickedFile.create(xfile);
 
-    if (file.type == null) {
-      throw 'Error file type not supported (only image or video)';
-    }
+  //   if (file.type == null) {
+  //     throw 'Error file type not supported (only image or video)';
+  //   }
 
-    _pickedFile?.delete();
+  //   _pickedFile?.delete();
 
-    if (file.isVideo) {
-      videoController?.dispose();
-      videoController = null;
-      videoController = VideoPlayerController.file(file.file);
+  //   if (file.isVideo) {
+  //     videoController?.dispose();
+  //     videoController = null;
+  //     videoController = VideoPlayerController.file(file.file);
 
-      await videoController?.initialize();
-      videoController?.setLooping(true);
-      videoController?.play();
+  //     await videoController?.initialize();
+  //     videoController?.setLooping(true);
+  //     videoController?.play();
 
-      final size = videoController?.value.size;
-      if (size == null) {
-        throw 'Error cannot determine video size';
-      }
+  //     final size = videoController?.value.size;
+  //     if (size == null) {
+  //       throw 'Error cannot determine video size';
+  //     }
 
-      setState(() {
-        _pickedFile = file.copyWithSize(size);
-      });
-    } else {
-      setState(() {
-        _pickedFile = file;
-      });
-    }
-  }
+  //     setState(() {
+  //       _pickedFile = file.copyWithSize(size);
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _pickedFile = file;
+  //     });
+  //   }
+  // }
 
   Future<void> _cropImage() async {
     final scale = cropKey.currentState?.scale;
